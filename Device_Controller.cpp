@@ -10,16 +10,17 @@
 
 // List of other commands: 
 // https://github.com/softScheck/tplink-smartplug/blob/master/tplink-smarthome-commands.txt
+// https://www.briandorey.com/post/tp-link-lb130-smart-wi-fi-led-bulb-python-control
 
 // #############################################################################
 // #############################################################################
 // #############################################################################
 
-#include "Plug_Controller.h"
+#include "Device_Controller.h"
 
 // #############################################################################
 
-PlugController::PlugController(IPAddress ip, uint16_t port)
+DeviceController::DeviceController(IPAddress ip, uint16_t port)
 {
     targetIP = ip;
     targetPort = port;
@@ -27,7 +28,7 @@ PlugController::PlugController(IPAddress ip, uint16_t port)
 
 // #############################################################################
 
-void PlugController::serializeUint32(char (&buf)[4], uint32_t val)
+void DeviceController::serializeUint32(char (&buf)[4], uint32_t val)
 {
     buf[0] = (val >> 24) & 0xff;
     buf[1] = (val >> 16) & 0xff;
@@ -37,7 +38,7 @@ void PlugController::serializeUint32(char (&buf)[4], uint32_t val)
 
 // #############################################################################
 
-void PlugController::decrypt(char* input, uint16_t length)
+void DeviceController::decrypt(char* input, uint16_t length)
 {
     uint8_t key = 171;
     uint8_t next_key;
@@ -50,7 +51,7 @@ void PlugController::decrypt(char* input, uint16_t length)
 
 // #############################################################################
 
-void PlugController::encrypt(char* data, uint16_t length)
+void DeviceController::encrypt(char* data, uint16_t length)
 {
     uint8_t key = 171;
     for (uint16_t i = 0; i < length + 1; i++) {
@@ -61,7 +62,7 @@ void PlugController::encrypt(char* data, uint16_t length)
 
 // #############################################################################
 
-void PlugController::encryptWithHeader(char* out, char* data, uint16_t length)
+void DeviceController::encryptWithHeader(char* out, char* data, uint16_t length)
 {
     char serialized[4];
     serializeUint32(serialized, length);
@@ -72,7 +73,7 @@ void PlugController::encryptWithHeader(char* out, char* data, uint16_t length)
 
 // #############################################################################
 
-String PlugController::getInfo()
+String DeviceController::getInfo()
 {
     const String cmd = "{\"system\":{\"get_sysinfo\":{}}}";
     return sendCmd(cmd);
@@ -80,7 +81,7 @@ String PlugController::getInfo()
 
 // #############################################################################
 
-String PlugController::on()
+String DeviceController::plug_on()
 {
     const String cmd = "{\"system\":{\"set_relay_state\":{\"state\":1}}}";
     return sendCmd(cmd);
@@ -88,7 +89,7 @@ String PlugController::on()
 
 // #############################################################################
 
-String PlugController::off()
+String DeviceController::plug_off()
 {
     const String cmd = "{\"system\":{\"set_relay_state\":{\"state\":0}}}";
     return sendCmd(cmd);
@@ -96,7 +97,31 @@ String PlugController::off()
 
 // #############################################################################
 
-String PlugController::eraseEmeterStats()
+String DeviceController::bulb_on()
+{
+    const String cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":1,\"transition_period\":0}}}";
+    return sendCmd(cmd);
+}
+
+// #############################################################################
+
+String DeviceController::bulb_off()
+{
+    const String cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"on_off\":0,\"transition_period\":0}}}";
+    return sendCmd(cmd);
+}
+
+// #############################################################################
+
+String PlugController::setbulbcolour(uint16_t saturation, uint16_t hue)
+{
+    const String cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"saturation\":" + String(saturation) + ",\"hue\":" + String(hue) + ",\"color_temp\":0,\"transition_period\":0}}}";
+    return sendCmd(cmd);
+}
+
+// #############################################################################
+
+String DeviceController::eraseEmeterStats()
 {
     const String cmd = "{\"emeter\":{\"erase_emeter_stat\":null}}";
     return sendCmd(cmd);
@@ -104,7 +129,7 @@ String PlugController::eraseEmeterStats()
 
 // #############################################################################
 
-String PlugController::countDown(uint16_t seconds, bool act)
+String DeviceController::countDown(uint16_t seconds, bool act)
 {
     String cmd = "{\"count_down\":{\"add_rule\":{\"enable\":1,\"delay\":";
     cmd += String(seconds);
@@ -122,7 +147,7 @@ String PlugController::countDown(uint16_t seconds, bool act)
 
 // #############################################################################
 
-String PlugController::getEmeter()
+String DeviceController::getEmeter()
 {
     const String cmd = "{\"emeter\":{\"get_realtime\":{}}}";
     return sendCmd(cmd);
@@ -130,7 +155,7 @@ String PlugController::getEmeter()
 
 // #############################################################################
 
-String PlugController::setLed(bool power)
+String DeviceController::setLed(bool power)
 {
     String cmd = "{\"system\":{\"set_led_off\":{\"off\":1}}}";
     if (power) {
@@ -141,7 +166,7 @@ String PlugController::setLed(bool power)
 
 // #############################################################################
 
-String PlugController::sendCmd(String cmd)
+String DeviceController::sendCmd(String cmd)
 {
     char encrypted[cmd.length() + 4];
     encryptWithHeader(encrypted, const_cast<char*>(cmd.c_str()), cmd.length());
@@ -156,7 +181,7 @@ String PlugController::sendCmd(String cmd)
 
 // #############################################################################
 
-uint16_t PlugController::tcpConnect(char* out, const char* cmd, uint16_t length, unsigned long timeout_millis)
+uint16_t DeviceController::tcpConnect(char* out, const char* cmd, uint16_t length, unsigned long timeout_millis)
 {
     WiFiClient plug_client;
     if (plug_client.connect(this->targetIP, this->targetPort)) 
@@ -202,15 +227,3 @@ uint16_t PlugController::tcpConnect(char* out, const char* cmd, uint16_t length,
     }
     return 0;
 }
-
-// #############################################################################
-// #############################################################################
-// #############################################################################
-
-// Taxation == theft
-// Contracts without >=2 matching declarations of intent are void
-// Freedom of speech > your ego/feelings
-
-// #############################################################################
-// #############################################################################
-// #############################################################################
