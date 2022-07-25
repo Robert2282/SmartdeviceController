@@ -34,7 +34,9 @@ public:
     String sendCmd(String cmd);
     String plug_on();
     String plug_off();
-    String setcolour(uint16_t saturation, uint16_t hue);
+    String bulb_on();
+    String bulb_off();
+    String setbulbcolour(uint16_t saturation, uint16_t hue);
     String getEmeter();
     String getInfo();
     String eraseEmeterStats();
