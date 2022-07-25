@@ -2,8 +2,8 @@
 // #############################################################################
 // #############################################################################
 
-// TP-Link HS100/HS110 SmartPlug Controller for ESP8266/ESP32
-// by Miraculix200 (not affiliated with TP-Link)
+// TP-Link Device Controller for ESP8266/ESP32
+// forked from Miraculix200 (not affiliated with TP-Link)
 // License: MIT
 
 // Code may stop working any time if TP-Link changes their firmware
@@ -12,13 +12,13 @@
 // #############################################################################
 // #############################################################################
 
-#ifndef PLUG_CONTROLLER_H
-#define PLUG_CONTROLLER_H
+#ifndef DEVICE_CONTROLLER_H
+#define DEVICE_CONTROLLER_H
 
 #include <Arduino.h>
 #include <WiFiClient.h>
 
-class PlugController {
+class DeviceController {
 
 private:
     IPAddress targetIP;
@@ -30,10 +30,11 @@ private:
     uint16_t tcpConnect(char* out, const char* cmd, uint16_t length, unsigned long timeout_millis);
 
 public:
-    PlugController(IPAddress ip, uint16_t port);
+    DeviceController(IPAddress ip, uint16_t port);
     String sendCmd(String cmd);
-    String on();
-    String off();
+    String plug_on();
+    String plug_off();
+    String setcolour(uint16_t saturation, uint16_t hue);
     String getEmeter();
     String getInfo();
     String eraseEmeterStats();
