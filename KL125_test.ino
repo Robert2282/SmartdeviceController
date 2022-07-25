@@ -5,8 +5,8 @@
 #include "Device_Controller.h"
 #include <WiFi.h>
 
-const char* ssid = "Troy And Abed In A Bubble";
-const char* password = "Community-19";
+const char* ssid = "123";
+const char* password = "123";
 
 IPAddress bulbIP = { 192, 168, 2, 141 };
 BulbController bulb(bulbIP, 9999);
