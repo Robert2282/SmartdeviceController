@@ -9,7 +9,7 @@
 // Code may stop working any time if TP-Link changes their firmware
 
 // List of other commands: 
-// https://github.com/softScheck/tplink-smartplug/blob/master/tplink-smarthome-commands.txt
+// https://www.briandorey.com/post/tp-link-lb130-smart-wi-fi-led-bulb-python-control
 
 // #############################################################################
 // #############################################################################
@@ -136,7 +136,6 @@ uint16_t BulbController::tcpConnect(char* out, const char* cmd, uint16_t length,
     {
         delay(10);
         Bulb_client.write(cmd, length);
-        Bulb_client2.write(cmd, length);
 
         // give the Bulb some time to think about its response ^^ 
         // otherwise there may be no response
