@@ -132,11 +132,7 @@ String BulbController::sendCmd(String cmd)
 uint16_t BulbController::tcpConnect(char* out, const char* cmd, uint16_t length, unsigned long timeout_millis)
 {
     WiFiClient Bulb_client;
-    WiFiClient Bulb_client2;
-    IPAddress bulbIP2 = { 192, 168, 2, 142 };
     if (Bulb_client.connect(this->targetIP, this->targetPort))
-    if (Bulb_client2.connect(bulbIP2, this->targetPort)) 
-    { 
     {
         delay(10);
         Bulb_client.write(cmd, length);
@@ -177,8 +173,6 @@ uint16_t BulbController::tcpConnect(char* out, const char* cmd, uint16_t length,
         // timeout/not connected
         delay(10);
         Bulb_client.flush();
-        Bulb_client2.flush();
-    }
     }
     return 0;
 }
